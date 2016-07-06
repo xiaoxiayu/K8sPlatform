@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: platform-web
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: platform-web
+    spec:
+      containers:
+      - name: platformweb
+        image: 10.103.129.81:5000/fxqa-platform:v1
+        ports:
+        - containerPort: 9000
+      nodeSelector:
+        SET: platform
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-web-service
+  labels:
+    run: platform-web-service
+spec:
+  type: NodePort
+  ports:
+  - port: 9000
+    protocol: TCP
+    nodePort: 32455
+  selector:
+    run: platform-web

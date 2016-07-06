@@ -1,0 +1,40 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: fxqa-test
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: fxqa-test 
+    spec:
+      containers:
+      - name: fxqa-test
+        image: 10.103.129.81:5000/fx-test:beta1.1
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+        - mountPath: /testfiles
+          name: testfiles-volume
+      volumes:
+      - name: testfiles-volume
+        hostPath:
+          path: /mnt/mfs/Public/TestFiles
+      nodeSelector:
+        fxcore: tester
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fxqa-test-service
+  labels:
+    run: fxqa-test-service
+spec:
+  type: NodePort
+  ports:
+  - port: 9090
+    protocol: TCP
+    nodePort: 32460
+  selector:
+    run: fxqa-test
